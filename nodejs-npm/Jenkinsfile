@@ -1,0 +1,44 @@
+@Library('blackduck-logs-publisher') _
+
+pipeline {
+    agent { label 'mac-sh' }
+
+    stages {
+        stage("Build") {
+            steps {
+                script {
+                    echo "JOB_NAME: ${env.JOB_NAME}"
+
+                    dir('nodejs-npm') {
+                        sh 'node --version'
+                        sh 'npm --version'
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
+
+        stage("polaris-rapid-scan") {
+            steps {
+                script {
+                    dir('nodejs-npm') {
+                        security_scan polaris_assessment_types: 'SAST,SCA', polaris_waitForScan: true, product: 'polaris',
+                        polaris_test_sast_type: 'SAST_RAPID'  
+
+                        
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            pushJenkinsLogsToGitHub([
+                githubOrg: 'polaris-jenkins-samples',
+                repoName: 'sigma-rapid-scan',
+                retentionCount: 5
+            ])
+        }
+    }
+}
