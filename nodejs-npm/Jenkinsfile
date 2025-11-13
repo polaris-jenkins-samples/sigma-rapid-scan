@@ -22,8 +22,8 @@ pipeline {
             steps {
                 script {
                     dir('nodejs-npm') {
-                        security_scan polaris_assessment_types: 'SAST,SCA', polaris_waitForScan: true, product: 'polaris',
-                        polaris_test_sast_type: 'SAST_RAPID'  
+                        security_scan polaris_assessment_types: 'SAST,SCA', polaris_waitForScan: true, polaris_test_sast_type: 'SAST_RAPID', product: 'polaris',
+                          
 
                         
                     }
